@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "purelane_hero": {
+      "type": "purelane-hero",
+      "settings": {}
+    },
+    "purelane_reviews": {
+      "type": "purelane-reviews",
+      "settings": {}
+    },
+    "purelane_shop": {
+      "type": "purelane-shop",
+      "settings": {}
+    },
+    "purelane_combos": {
+      "type": "purelane-combos",
+      "settings": {}
+    },
+    "purelane_bundles": {
+      "type": "purelane-bundles",
+      "settings": {}
+    }
+  },
+  "order": [
+    "purelane_hero",
+    "purelane_reviews",
+    "purelane_shop",
+    "purelane_combos",
+    "purelane_bundles"
+  ]
+}
