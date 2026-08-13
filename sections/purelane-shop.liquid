@@ -1,0 +1,188 @@
+{% comment %}
+  Purelane Shop Section
+  Product grid using real Shopify collection data
+{% endcomment %}
+
+<link rel="stylesheet" href="{{ 'purelane-product-card.css' | asset_url }}">
+<link rel="stylesheet" href="{{ 'purelane-shop.css' | asset_url }}">
+
+<section class="purelane-shop sec" id="purelane-shop-{{ section.id }}" data-section-id="{{ section.id }}">
+  <div class="wrap">
+    <div class="panel-head rv">
+      {% if section.settings.kicker != blank %}
+        <span class="kicker">{{ section.settings.kicker }}</span>
+      {% endif %}
+      <h2 class="d2" style="margin-top:12px">{{ section.settings.heading }}</h2>
+      <div class="rule">
+        <i></i>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 21c0-6.5 3.5-11 8-12.5C20 15 16.5 20 12 21Z"/>
+          <path d="M12 21C12 14.5 8.5 10 4 8.5 4 15 7.5 20 12 21Z"/>
+        </svg>
+        <i></i>
+      </div>
+    </div>
+
+    <div class="purelane-shop__grid">
+      {% if section.settings.collection != blank %}
+        {% assign collection = section.settings.collection %}
+        {% assign products_to_show = section.settings.products_to_show | default: 8 %}
+
+        {% for product in collection.products limit: products_to_show %}
+          {% assign delay_class = '' %}
+          {% case forloop.index %}
+            {% when 2 %}
+              {% assign delay_class = 'rv-d1' %}
+            {% when 3 %}
+              {% assign delay_class = 'rv-d2' %}
+            {% when 4 %}
+              {% assign delay_class = 'rv-d3' %}
+          {% endcase %}
+
+          {% assign show_badge = false %}
+          {% assign badge_text = '' %}
+
+          {% if forloop.index <= 2 %}
+            {% assign show_badge = true %}
+            {% assign badge_text = 'Best seller' %}
+          {% elsif product.tags contains 'new' %}
+            {% assign show_badge = true %}
+            {% assign badge_text = 'New' %}
+          {% elsif product.tags contains 'top-rated' %}
+            {% assign show_badge = true %}
+            {% assign badge_text = 'Top rated' %}
+          {% endif %}
+
+          {% render 'purelane-product-card',
+            product: product,
+            show_badge: show_badge,
+            badge_text: badge_text,
+            class: delay_class
+          %}
+        {% endfor %}
+      {% else %}
+        {% comment %} Fallback: show all products if no collection selected {% endcomment %}
+        {% assign products_to_show = section.settings.products_to_show | default: 8 %}
+        {% for product in collections.all.products limit: products_to_show %}
+          {% assign delay_class = '' %}
+          {% case forloop.index %}
+            {% when 2 %}
+              {% assign delay_class = 'rv-d1' %}
+            {% when 3 %}
+              {% assign delay_class = 'rv-d2' %}
+            {% when 4 %}
+              {% assign delay_class = 'rv-d3' %}
+          {% endcase %}
+
+          {% render 'purelane-product-card',
+            product: product,
+            class: delay_class
+          %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    {% if section.settings.show_view_all and section.settings.collection != blank %}
+      <div class="purelane-shop__footer">
+        <a href="{{ section.settings.collection.url }}" class="btn btn-ghost">
+          {{ section.settings.view_all_text }}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h13m-5-6 6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Purelane Shop",
+  "tag": "section",
+  "class": "section-purelane-shop",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Heading"
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Kicker",
+      "default": "Bestsellers"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Loved by 30,000 homes"
+    },
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Leave empty to show all products"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns (desktop)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4,
+      "info": "Number of products per row on desktop"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns (mobile)",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 column"
+        },
+        {
+          "value": "2",
+          "label": "2 columns"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "View All Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View all' button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "Button text",
+      "default": "View all products"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane Shop"
+    }
+  ]
+}
+{% endschema %}
