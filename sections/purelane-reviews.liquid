@@ -1,0 +1,212 @@
+{% comment %}
+  Purelane Reviews Rail Section
+  Continuous horizontal scrolling review carousel
+{% endcomment %}
+
+<link rel="stylesheet" href="{{ 'purelane-reviews.css' | asset_url }}">
+
+<section class="purelane-reviews sec" id="purelane-reviews-{{ section.id }}" data-section-id="{{ section.id }}">
+  <div class="wrap">
+    <div class="purelane-reviews__head rv">
+      <span class="kicker">{{ section.settings.kicker }}</span>
+      <span class="purelane-reviews__agg">
+        <span class="purelane-reviews__stars">★★★★★</span>
+        <b>{{ section.settings.rating }}</b> from {{ section.settings.review_count }} reviews
+      </span>
+      {% if section.settings.total_homes != blank %}
+        <span class="purelane-reviews__agg">
+          Loved by <b>{{ section.settings.total_homes }}</b> homes
+        </span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="purelane-reviews__rail rv" aria-label="Customer reviews">
+    <div class="purelane-reviews__track" data-reviews-track>
+      {% comment %} Render blocks twice for seamless loop {% endcomment %}
+      {% for i in (1..2) %}
+        {% for block in section.blocks %}
+          {% if block.type == 'review' %}
+            <article class="purelane-reviews__card glass-2" {{ block.shopify_attributes }}>
+              <div class="purelane-reviews__stars">★★★★★</div>
+              <h5>{{ block.settings.title }}</h5>
+              <p>{{ block.settings.review }}</p>
+              <div class="purelane-reviews__who">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m5 13 4 4L19 7"/>
+                </svg>
+                <b>{{ block.settings.reviewer_name }}</b>
+                {% if block.settings.product_name != blank %}
+                  <span>&middot; {{ block.settings.product_name }}</span>
+                {% endif %}
+              </div>
+            </article>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  const sectionId = 'purelane-reviews-{{ section.id }}';
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+
+  const track = section.querySelector('[data-reviews-track]');
+  if (!track) return;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Pause animation on hover/focus
+  if (!reduceMotion) {
+    track.addEventListener('mouseenter', () => {
+      track.style.animationPlayState = 'paused';
+    });
+
+    track.addEventListener('mouseleave', () => {
+      track.style.animationPlayState = 'running';
+    });
+
+    track.addEventListener('focusin', () => {
+      track.style.animationPlayState = 'paused';
+    });
+
+    track.addEventListener('focusout', () => {
+      track.style.animationPlayState = 'running';
+    });
+  }
+
+  // Clean up on section unload
+  document.addEventListener('shopify:section:unload', function(event) {
+    if (event.detail.sectionId === '{{ section.id }}') {
+      // Cleanup if needed
+    }
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Purelane Reviews Rail",
+  "tag": "section",
+  "class": "section-purelane-reviews",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Review Summary"
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Kicker Text",
+      "default": "That's what they said"
+    },
+    {
+      "type": "text",
+      "id": "rating",
+      "label": "Average Rating",
+      "default": "4.8"
+    },
+    {
+      "type": "text",
+      "id": "review_count",
+      "label": "Review Count",
+      "default": "8,000+"
+    },
+    {
+      "type": "text",
+      "id": "total_homes",
+      "label": "Total Homes",
+      "default": "12 lakh+",
+      "info": "Optional - leave blank to hide"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Review Title",
+          "default": "Works like a charm"
+        },
+        {
+          "type": "textarea",
+          "id": "review",
+          "label": "Review Text",
+          "default": "Finally an eco option that cleans as well as the chemical detergent I used for years, and it smells better."
+        },
+        {
+          "type": "text",
+          "id": "reviewer_name",
+          "label": "Reviewer Name",
+          "default": "Anita"
+        },
+        {
+          "type": "text",
+          "id": "product_name",
+          "label": "Product Name",
+          "default": "Laundry detergent",
+          "info": "Optional"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Purelane Reviews Rail",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "title": "Works like a charm",
+            "review": "Finally an eco option that cleans as well as the chemical detergent I used for years, and it smells better.",
+            "reviewer_name": "Anita",
+            "product_name": "Laundry detergent"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Best dishwash ever",
+            "review": "Our old dishwash left my help with dry, cracked skin. That stopped completely after we switched.",
+            "reviewer_name": "Priya",
+            "product_name": "Dishwash gel"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Great product, great packaging",
+            "review": "Very soft on hands with a lovely fragrance, and it feels good to be using far less plastic.",
+            "reviewer_name": "Sunita",
+            "product_name": "Liquid handwash"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Dog friendly",
+            "review": "We switched because chemical floor cleaners were setting off my dog's allergies. No reactions since.",
+            "reviewer_name": "Rohit S.",
+            "product_name": "Floor cleaner"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "title": "Sparkling taps again",
+            "review": "Hard water had ruined our bathroom fittings. Two sprays and the scale wipes straight off, no scrubbing.",
+            "reviewer_name": "Verified buyer",
+            "product_name": "Tap cleaner"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
