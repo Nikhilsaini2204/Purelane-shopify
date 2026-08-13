@@ -1,0 +1,82 @@
+{% comment %}
+  Reusable Purelane product card
+
+  Accepts:
+  - product: {Object} Shopify product object (required)
+  - show_badge: {Boolean} Show badge/pill (optional)
+  - badge_text: {String} Badge text (optional)
+  - class: {String} Additional CSS classes (optional)
+
+  Usage:
+  {% render 'purelane-product-card', product: product, show_badge: true, badge_text: 'Best seller' %}
+{% endcomment %}
+
+{% if product %}
+  <article class="purelane-card glass {{ class }}">
+    <div class="purelane-card__image">
+      {% if show_badge and badge_text %}
+        <span class="purelane-card__badge">{{ badge_text }}</span>
+      {% endif %}
+
+      {% if product.featured_image %}
+        <img
+          src="{{ product.featured_image | image_url: width: 400 }}"
+          srcset="{{ product.featured_image | image_url: width: 200 }} 200w,
+                  {{ product.featured_image | image_url: width: 400 }} 400w,
+                  {{ product.featured_image | image_url: width: 600 }} 600w"
+          sizes="(min-width: 860px) 25vw, (min-width: 640px) 50vw, 100vw"
+          alt="{{ product.featured_image.alt | escape }}"
+          width="{{ product.featured_image.width }}"
+          height="{{ product.featured_image.height }}"
+          loading="lazy"
+        >
+      {% else %}
+        <div class="purelane-card__placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+        </div>
+      {% endif %}
+
+      {% if product.available == false %}
+        <span class="purelane-card__sold-out">Sold out</span>
+      {% endif %}
+    </div>
+
+    <div class="purelane-card__content">
+      <h4 class="purelane-card__title">
+        <a href="{{ product.url }}">{{ product.title }}</a>
+      </h4>
+
+      {% if product.metafields.reviews.rating.value %}
+        <div class="purelane-card__rating">
+          <b>★ {{ product.metafields.reviews.rating.value }}</b> · {{ product.metafields.reviews.rating_count | default: 0 }} reviews
+        </div>
+      {% endif %}
+
+      <div class="purelane-card__price">
+        {% if product.compare_at_price > product.price %}
+          <strong>{{ product.price | money }}</strong>
+          <s>{{ product.compare_at_price | money }}</s>
+          {% assign savings = product.compare_at_price | minus: product.price %}
+          {% assign percent_off = savings | times: 100 | divided_by: product.compare_at_price %}
+          <em>{{ percent_off }}% off</em>
+        {% else %}
+          <strong>{{ product.price | money }}</strong>
+        {% endif %}
+      </div>
+
+      {% if product.available %}
+        <button type="button" class="btn btn-ghost btn-sm purelane-add-to-cart" data-product-id="{{ product.id }}" data-variant-id="{{ product.selected_or_first_available_variant.id }}">
+          Add to cart
+        </button>
+      {% else %}
+        <button type="button" class="btn btn-ghost btn-sm" disabled>
+          Sold out
+        </button>
+      {% endif %}
+    </div>
+  </article>
+{% endif %}
